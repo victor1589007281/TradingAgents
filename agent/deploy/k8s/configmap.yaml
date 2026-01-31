@@ -1,0 +1,48 @@
+# Kubernetes ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tradingagents-config
+  namespace: tradingagents
+  labels:
+    app.kubernetes.io/name: tradingagents
+    app.kubernetes.io/component: config
+data:
+  # LLM 配置
+  LLM_PROVIDER: "openai"
+  DEEP_THINK_LLM: "o4-mini"
+  QUICK_THINK_LLM: "gpt-4o-mini"
+  BACKEND_URL: "https://api.openai.com/v1"
+  
+  # Embedding 配置
+  EMBEDDING_MODEL: "text-embedding-3-small"
+  
+  # 辩论配置
+  MAX_DEBATE_ROUNDS: "1"
+  MAX_RISK_DISCUSS_ROUNDS: "1"
+  MAX_RECUR_LIMIT: "100"
+  
+  # 数据源配置
+  CORE_STOCK_APIS: "yfinance"
+  TECHNICAL_INDICATORS: "yfinance"
+  FUNDAMENTAL_DATA: "alpha_vantage"
+  NEWS_DATA: "alpha_vantage"
+  
+  # 应用配置
+  APP_ENV: "production"
+  LOG_LEVEL: "info"
+  
+  # 配置文件内容
+  config.yaml: |
+    llm_provider: openai
+    deep_think_llm: o4-mini
+    quick_think_llm: gpt-4o-mini
+    backend_url: https://api.openai.com/v1
+    embedding_model: text-embedding-3-small
+    max_debate_rounds: 1
+    max_risk_discuss_rounds: 1
+    data_vendors:
+      core_stock_apis: yfinance
+      technical_indicators: yfinance
+      fundamental_data: alpha_vantage
+      news_data: alpha_vantage

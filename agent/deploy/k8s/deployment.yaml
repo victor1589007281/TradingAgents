@@ -1,0 +1,156 @@
+# Kubernetes Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tradingagents
+  namespace: tradingagents
+  labels:
+    app.kubernetes.io/name: tradingagents
+    app.kubernetes.io/component: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tradingagents
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tradingagents
+      annotations:
+        # 配置变更时自动滚动更新
+        checksum/config: "{{ include (print $.Template.BasePath \"/configmap.yaml\") . | sha256sum }}"
+    spec:
+      serviceAccountName: tradingagents
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      
+      containers:
+        - name: tradingagents
+          image: tradingagents:latest
+          imagePullPolicy: IfNotPresent
+          
+          # 安全上下文
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          
+          # 命令和参数
+          command: ["/app/tradingagents"]
+          args: ["run", "--ticker", "NVDA", "--date", "2024-05-10"]
+          
+          # 环境变量
+          env:
+            - name: APP_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: tradingagents-config
+                  key: APP_ENV
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: tradingagents-config
+                  key: LOG_LEVEL
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: tradingagents-secrets
+                  key: OPENAI_API_KEY
+            - name: ALPHA_VANTAGE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: tradingagents-secrets
+                  key: ALPHA_VANTAGE_API_KEY
+                  optional: true
+          
+          # 资源限制
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          
+          # 卷挂载
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config
+              readOnly: true
+            - name: data-volume
+              mountPath: /app/data
+            - name: results-volume
+              mountPath: /app/results
+            - name: tmp-volume
+              mountPath: /tmp
+          
+          # 健康检查
+          livenessProbe:
+            exec:
+              command:
+                - /app/tradingagents
+                - version
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          
+          readinessProbe:
+            exec:
+              command:
+                - /app/tradingagents
+                - version
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+      
+      # 卷定义
+      volumes:
+        - name: config-volume
+          configMap:
+            name: tradingagents-config
+        - name: data-volume
+          emptyDir: {}
+        - name: results-volume
+          emptyDir: {}
+        - name: tmp-volume
+          emptyDir: {}
+      
+      # 节点选择和容忍
+      # nodeSelector:
+      #   kubernetes.io/os: linux
+      
+      # tolerations:
+      #   - key: "dedicated"
+      #     operator: "Equal"
+      #     value: "tradingagents"
+      #     effect: "NoSchedule"
+
+---
+# ServiceAccount
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tradingagents
+  namespace: tradingagents
+  labels:
+    app.kubernetes.io/name: tradingagents
+
+---
+# PodDisruptionBudget (可选，用于高可用)
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: tradingagents-pdb
+  namespace: tradingagents
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tradingagents

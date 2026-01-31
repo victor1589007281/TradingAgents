@@ -1,0 +1,146 @@
+# golangci-lint 配置文件
+# https://golangci-lint.run/usage/configuration/
+
+run:
+  # 超时时间
+  timeout: 5m
+  
+  # 要检查的目录
+  tests: true
+  
+  # 跳过的目录
+  skip-dirs:
+    - vendor
+    - build
+    - deploy
+
+linters:
+  enable:
+    # 默认启用的 linters
+    - errcheck      # 检查未处理的错误
+    - gosimple      # 简化代码建议
+    - govet         # 报告可疑的构造
+    - ineffassign   # 检测无效的赋值
+    - staticcheck   # 静态分析
+    - unused        # 检测未使用的代码
+    
+    # 额外启用的 linters
+    - bodyclose     # 检查 HTTP 响应体是否关闭
+    - dogsled       # 检查过多的空白标识符
+    - dupl          # 检测重复代码
+    - errname       # 检查错误命名
+    - exhaustive    # 检查 switch 语句是否穷尽
+    - goconst       # 检测可以替换为常量的字符串
+    - gocritic      # 代码审查建议
+    - gofmt         # 检查代码格式
+    - goimports     # 检查 import 顺序
+    - gosec         # 安全检查
+    - misspell      # 检查拼写错误
+    - nakedret      # 检查裸返回
+    - nolintlint    # 检查 nolint 指令
+    - prealloc      # 检查 slice 预分配
+    - revive        # 代码风格检查
+    - unconvert     # 检查不必要的类型转换
+    - unparam       # 检查未使用的参数
+    - whitespace    # 检查多余的空白
+
+linters-settings:
+  errcheck:
+    # 检查类型断言
+    check-type-assertions: true
+    # 检查空白标识符
+    check-blank: true
+
+  govet:
+    # 检查 shadow 变量
+    check-shadowing: true
+
+  gofmt:
+    # 简化代码
+    simplify: true
+
+  goimports:
+    # 本地包前缀
+    local-prefixes: github.com/tradingagents/agent
+
+  goconst:
+    # 最小字符串长度
+    min-len: 3
+    # 最小出现次数
+    min-occurrences: 3
+
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - style
+      - performance
+
+  gosec:
+    # 排除的规则
+    excludes:
+      - G104 # 未检查的错误（某些情况下可以接受）
+
+  misspell:
+    locale: US
+
+  revive:
+    rules:
+      - name: blank-imports
+      - name: context-as-argument
+      - name: context-keys-type
+      - name: dot-imports
+      - name: error-return
+      - name: error-strings
+      - name: error-naming
+      - name: exported
+      - name: if-return
+      - name: increment-decrement
+      - name: var-naming
+      - name: var-declaration
+      - name: package-comments
+      - name: range
+      - name: receiver-naming
+      - name: time-naming
+      - name: unexported-return
+      - name: indent-error-flow
+      - name: errorf
+      - name: empty-block
+      - name: superfluous-else
+      - name: unused-parameter
+      - name: unreachable-code
+      - name: redefines-builtin-id
+
+  unparam:
+    # 检查导出的函数
+    check-exported: false
+
+issues:
+  # 排除的问题
+  exclude-rules:
+    # 测试文件中允许使用 dot imports
+    - path: _test\.go
+      linters:
+        - dupl
+        - goconst
+        - gosec
+    
+    # 允许 main 函数中的 fmt.Print
+    - path: cmd/main\.go
+      linters:
+        - forbidigo
+
+  # 最大相同问题数
+  max-same-issues: 0
+  
+  # 是否显示所有问题
+  max-issues-per-linter: 0
+
+output:
+  # 输出格式
+  format: colored-line-number
+  
+  # 打印发出问题的 linter 名称
+  print-linter-name: true
+  
+  # 按文件、行、列排序
+  sort-results: true

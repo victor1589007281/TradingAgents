@@ -1,0 +1,147 @@
+# Helm Values
+# 默认配置值
+
+# 副本数
+replicaCount: 1
+
+# 镜像配置
+image:
+  repository: tradingagents
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# Service Account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Pod 安全上下文
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+
+# 容器安全上下文
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+# Service 配置
+service:
+  type: ClusterIP
+  port: 8080
+
+# Ingress 配置
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: tradingagents.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+# 资源限制
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+# 自动扩缩
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
+# 节点选择
+nodeSelector: {}
+
+# 容忍
+tolerations: []
+
+# 亲和性
+affinity: {}
+
+# 应用配置
+config:
+  # LLM 配置
+  llmProvider: "openai"
+  deepThinkLLM: "o4-mini"
+  quickThinkLLM: "gpt-4o-mini"
+  backendURL: "https://api.openai.com/v1"
+  
+  # Embedding 配置
+  embeddingModel: "text-embedding-3-small"
+  
+  # 辩论配置
+  maxDebateRounds: 1
+  maxRiskDiscussRounds: 1
+  maxRecurLimit: 100
+  
+  # 数据源配置
+  dataVendors:
+    coreStockAPIs: "yfinance"
+    technicalIndicators: "yfinance"
+    fundamentalData: "alpha_vantage"
+    newsData: "alpha_vantage"
+  
+  # 应用配置
+  appEnv: "production"
+  logLevel: "info"
+
+# Secrets（建议使用 external-secrets）
+secrets:
+  # 直接设置 API keys（不推荐用于生产）
+  openaiApiKey: ""
+  alphaVantageApiKey: ""
+  
+  # 使用已存在的 secret
+  existingSecret: ""
+
+# CronJob 配置
+cronjob:
+  enabled: false
+  schedule: "0 14 * * 1-5"  # 工作日 UTC 14:00
+  timeZone: "America/New_York"
+  tickers:
+    - "NVDA"
+  
+  # 资源限制
+  resources:
+    limits:
+      cpu: 1
+      memory: 1Gi
+    requests:
+      cpu: 200m
+      memory: 512Mi
+
+# 持久化存储
+persistence:
+  enabled: false
+  storageClass: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 1Gi
+
+# 监控配置
+metrics:
+  enabled: false
+  serviceMonitor:
+    enabled: false
+    namespace: ""
+    interval: 30s

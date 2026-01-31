@@ -1,0 +1,38 @@
+# Kubernetes Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: tradingagents
+  namespace: tradingagents
+  labels:
+    app.kubernetes.io/name: tradingagents
+    app.kubernetes.io/component: service
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: tradingagents
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+
+---
+# Headless Service (用于 StatefulSet 或直接 Pod 访问)
+apiVersion: v1
+kind: Service
+metadata:
+  name: tradingagents-headless
+  namespace: tradingagents
+  labels:
+    app.kubernetes.io/name: tradingagents
+    app.kubernetes.io/component: headless-service
+spec:
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: tradingagents
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080

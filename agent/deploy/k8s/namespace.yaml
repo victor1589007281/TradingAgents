@@ -1,0 +1,8 @@
+# Kubernetes Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tradingagents
+  labels:
+    app.kubernetes.io/name: tradingagents
+    app.kubernetes.io/component: namespace

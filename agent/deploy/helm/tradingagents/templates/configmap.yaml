@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "tradingagents.fullname" . }}-config
+  labels:
+    {{- include "tradingagents.labels" . | nindent 4 }}
+data:
+  LLM_PROVIDER: {{ .Values.config.llmProvider | quote }}
+  DEEP_THINK_LLM: {{ .Values.config.deepThinkLLM | quote }}
+  QUICK_THINK_LLM: {{ .Values.config.quickThinkLLM | quote }}
+  BACKEND_URL: {{ .Values.config.backendURL | quote }}
+  EMBEDDING_MODEL: {{ .Values.config.embeddingModel | quote }}
+  MAX_DEBATE_ROUNDS: {{ .Values.config.maxDebateRounds | quote }}
+  MAX_RISK_DISCUSS_ROUNDS: {{ .Values.config.maxRiskDiscussRounds | quote }}
+  MAX_RECUR_LIMIT: {{ .Values.config.maxRecurLimit | quote }}
+  CORE_STOCK_APIS: {{ .Values.config.dataVendors.coreStockAPIs | quote }}
+  TECHNICAL_INDICATORS: {{ .Values.config.dataVendors.technicalIndicators | quote }}
+  FUNDAMENTAL_DATA: {{ .Values.config.dataVendors.fundamentalData | quote }}
+  NEWS_DATA: {{ .Values.config.dataVendors.newsData | quote }}
+  config.yaml: |
+    llm_provider: {{ .Values.config.llmProvider }}
+    deep_think_llm: {{ .Values.config.deepThinkLLM }}
+    quick_think_llm: {{ .Values.config.quickThinkLLM }}
+    backend_url: {{ .Values.config.backendURL }}
+    embedding_model: {{ .Values.config.embeddingModel }}
+    max_debate_rounds: {{ .Values.config.maxDebateRounds }}
+    max_risk_discuss_rounds: {{ .Values.config.maxRiskDiscussRounds }}
+    max_recur_limit: {{ .Values.config.maxRecurLimit }}
+    data_vendors:
+      core_stock_apis: {{ .Values.config.dataVendors.coreStockAPIs }}
+      technical_indicators: {{ .Values.config.dataVendors.technicalIndicators }}
+      fundamental_data: {{ .Values.config.dataVendors.fundamentalData }}
+      news_data: {{ .Values.config.dataVendors.newsData }}

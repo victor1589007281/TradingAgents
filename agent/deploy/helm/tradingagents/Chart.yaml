@@ -1,0 +1,23 @@
+# Helm Chart
+apiVersion: v2
+name: tradingagents
+description: A Helm chart for TradingAgents - Multi-agent LLM trading system
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+
+keywords:
+  - trading
+  - agents
+  - llm
+  - ai
+  - finance
+
+home: https://github.com/TradingAgents/TradingAgents
+
+sources:
+  - https://github.com/TradingAgents/TradingAgents
+
+maintainers:
+  - name: TradingAgents Team
+    email: team@tradingagents.io
